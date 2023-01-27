@@ -6,6 +6,26 @@ const app = express();
 (async () => {
   const browser = await puppeteer.launch({headless: true});
 
+  // only top 3 hashtags
+  // http://localhost:3000/hashtag/trend
+  app.get("/hashtag/trend/:period?", async (req, res) => {
+    const { period } = req.params;
+
+    // hashtags insights data
+    const url = `https://ads.tiktok.com/business/creativecenter/inspiration/popular/hashtag/pc/en?page=1&size=20&sort_by=popular`;
+    const json = await fetch(url)
+      .then(res => res.text())
+      .then(res => JSON.parse(res.match(/{"props":.+?(?=<\/script>)/)[0]));
+
+    res.json(json?.props?.pageProps?.data?.list || {});
+  });
+
+  // period=1095 //   3 years
+  // period=365  //  12 months
+  // period=120  // 120 days
+  // period=30   //  30 days
+  // period=7    //  7 days
+  // http://localhost:3000/hashtag/noodles
   app.get("/hashtag/:hashtag/:period?", async (req, res) => {
     const { hashtag, period } = req.params;
 
@@ -26,6 +46,7 @@ const app = express();
     });
   });
 
+  // http://localhost:3000/videos/noodles
   app.get("/videos/:hashtag", async (req, res) => {
     const { hashtag } = req.params;
     const page = await browser.newPage(); // open new tab
@@ -53,6 +74,7 @@ const app = express();
     });
   });
 
+  // http://localhost:3000/user/gingersnark
   app.get("/user/:username", async (req, res) => {
     const { username } = req.params;
     const page = await browser.newPage(); // open new tab
