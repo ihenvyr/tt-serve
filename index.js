@@ -4,6 +4,8 @@ const puppeteer = require("puppeteer");
 const app = express();
 
 (async () => {
+  const isProduction = process.env.NODE_ENV === "production";
+  const port = isProduction ? 8080 : 3000;
   const browser = await puppeteer.launch({headless: true});
 
   // only top 3 hashtags
@@ -103,5 +105,5 @@ const app = express();
     });
   });
 
-  app.listen(3000, () => console.log("ok"));
+  app.listen(port, () => console.log(`server: ok, port: ${port}`));
 })();
